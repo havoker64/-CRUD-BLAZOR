@@ -1,0 +1,79 @@
+﻿@page "/"
+
+@using CRUD.Models;
+@inject CRUD.Services.IEmpresaSVC EmpresaSVC;
+
+
+<PageTitle>Empresas</PageTitle>
+
+<h1>Empresas</h1>
+
+<a href="/create" class="btn btn-success"> Criar </a>
+
+<table class="table table-responsive table-striped">
+    <!--Aqui iniciamos nossas tabela onde serão mostrados os registros-->
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Nome</th>
+            <th>Site</th>
+            <th>Seguimento</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        <!--Caso hajam dados estes serão compilados na tela por meio do laço de repetição-->
+        @if (empresas != null && empresas.Count > 0)
+        {
+            foreach (var item in empresas)
+            {
+                <tr>
+                    <td>@item.id</td>
+                    <td>@item.nome</td>
+                    <td>@item.site</td>
+                    <td>@item.seguimento</td>
+                    <td>
+                        <a href="/Information/@item.id" class="btn btn-sucess">Info</a>
+                        <a href="/update/@item.id" class="btn btn-warning">Atualizar</a>
+                        <button class="btn bnt-danger" @onclick="async() => await DeletarEmpresa(item.id)">Deletar</button>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+@code
+{
+    List<Empresa> empresas = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        //Realiza a listagem de todas as empresas cadastradas ao inicializar o sistema;
+        empresas = await EmpresaSVC.FindAll();
+    }
+
+    async Task DeletarEmpresa(Guid id)
+    {
+        //tenbtei implementar  uma caixa de confirmação da deleção da empresa utilizando jsruntime, porém ocoreram erros na hora da compilação ;-;.
+        //bool confirmed = await JSRuntime.InvokeAsync<bool>("Confirm", "Confirme a deleção do arquivo!");
+
+        /*Dependendo do que for decidido pelo usuário a variável mudará seu status para verdadeio ou falso, no seghundo caso nehnuma mudança deve ocorrer,
+         * mas no primeiro caso, se a variavel se apresentar verdadeira o registro do cadastro da empresa será deletado.*/
+        //if (confirmed is false)
+ 
+             //return;
+
+        //else
+        //{
+            var empresa = await EmpresaSVC.GetBy(id);
+
+            await EmpresaSVC.Deletar(empresa);
+
+            //após a deleção da empresa os registros são atualizados.
+            empresas = await EmpresaSVC.FindAll();
+
+            StateHasChanged();
+        //}
+    }
+}
